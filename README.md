@@ -6,7 +6,7 @@ This Kaggle notebook explores a complete experimental credit-risk workflow: appl
 
 ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white) ![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-F37626?logo=jupyter&logoColor=white) ![XGBoost](https://img.shields.io/badge/XGBoost-Classification-EC6B23) ![SHAP](https://img.shields.io/badge/SHAP-Interpretability-7952B3) [![Kaggle Notebook](https://img.shields.io/badge/Kaggle-Notebook-20BEFF?logo=kaggle&logoColor=white)](https://www.kaggle.com/code/lucalullo/home-credit-default-risk)
 
-[Kaggle notebook](https://www.kaggle.com/code/lucalullo/home-credit-default-risk) · [Explore the notebook](home-credit-default-risk.ipynb) · [GitHub profile](https://github.com/lucalullo)
+[Kaggle notebook](https://www.kaggle.com/code/lucalullo/home-credit-default-risk) · [GitHub repository](https://github.com/lucalullo/home-credit-default-risk)
 
 ## At a glance
 
@@ -39,7 +39,7 @@ The notebook covers:
 
 ## Methodology
 
-```text
+~~~text
 Kaggle application + historical data
         |
         v
@@ -66,7 +66,7 @@ Holdout ROC-AUC evaluation
         |
         v
 Competition test predictions
-```
+~~~
 
 ### Implementation details
 
@@ -98,13 +98,13 @@ These are notebook evaluation outputs, **not Kaggle leaderboard results**. The h
 
 ## Repository structure
 
-```text
+~~~text
 home-credit-default-risk/
 ├── README.md
 ├── home-credit-default-risk.ipynb
 ├── .gitignore
 └── LICENSE
-```
+~~~
 
 ## Getting started
 
@@ -112,9 +112,9 @@ The reference environment is **Kaggle**, using the [Home Credit Default Risk com
 
 For local execution, install the principal notebook dependencies:
 
-```bash
+~~~bash
 python -m pip install pandas numpy scipy scikit-learn xgboost imbalanced-learn optuna shap matplotlib seaborn jupyter
-```
+~~~
 
 Download the competition CSVs, open `home-credit-default-risk.ipynb`, and update the input directory used by the notebook. Full execution can be resource-intensive due to auxiliary-table aggregation, hyperparameter optimization and SHAP calculations.
 
@@ -131,9 +131,10 @@ Download the competition CSVs, open `home-credit-default-risk.ipynb`, and update
 
 ## Related work
 
-- [GitHub profile and selected projects](https://github.com/lucalullo)
-- [Kaggle profile](https://www.kaggle.com/lucalullo)
+This analysis complements my work on tabular machine learning, from-scratch algorithms, and reproducible Python projects.
+
+**[GitHub profile](https://github.com/lucalullo) · [Kaggle profile](https://www.kaggle.com/lucalullo)**
 
 ## Author
 
-Created by [Luca Lullo](https://github.com/lucalullo). Original work: [Home Credit Default Risk on Kaggle](https://www.kaggle.com/code/lucalullo/home-credit-default-risk).
+Created by [Luca Lullo](https://github.com/lucalullo).
