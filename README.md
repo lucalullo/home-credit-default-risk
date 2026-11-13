@@ -1,237 +1,139 @@
-
 # Home Credit Default Risk
 
-**Predicting credit default risk with XGBoost - combining multi-source feature engineering, class imbalance handling, Bayesian hyperparameter optimization, and SHAP explainability.**
+**Credit default risk classification with multi-table feature engineering, model comparison, Optuna optimization, and SHAP interpretation.**
 
-This project implements an end-to-end machine learning workflow for credit risk classification, from preprocessing and integrating multiple financial datasets to model comparison, threshold optimization, and interpretable predictions.
+This Kaggle notebook explores a complete experimental credit-risk workflow: application data preparation, class imbalance, additional credit-history features, predictive modeling, threshold selection, and explanation of model outputs.
 
-[![Kaggle Competition](https://img.shields.io/badge/Kaggle-Competition-20BEFF?logo=kaggle&logoColor=white)](https://www.kaggle.com/code/lucalullo/home-credit-default-risk)
-![Python](https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white)
-![Jupyter Notebook](https://img.shields.io/badge/Jupyter-Notebook-F37626?logo=jupyter&logoColor=white)
-![pandas](https://img.shields.io/badge/pandas-Data_Processing-150458?logo=pandas&logoColor=white)
-![XGBoost](https://img.shields.io/badge/XGBoost-Gradient_Boosting-337AB7)
-![Optuna](https://img.shields.io/badge/Optuna-Hyperparameter_Tuning-6C63FF)
-![SHAP](https://img.shields.io/badge/SHAP-Explainability-FF6B6B)
+![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white) ![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-F37626?logo=jupyter&logoColor=white) ![XGBoost](https://img.shields.io/badge/XGBoost-Classification-EC6B23) ![SHAP](https://img.shields.io/badge/SHAP-Interpretability-7952B3) [![Kaggle Notebook](https://img.shields.io/badge/Kaggle-Notebook-20BEFF?logo=kaggle&logoColor=white)](https://www.kaggle.com/code/lucalullo/home-credit-default-risk)
 
-**[View the original Kaggle notebook](https://www.kaggle.com/code/lucalullo/home-credit-default-risk)** | **[Explore the notebook](home-credit-default-risk.ipynb)** | **[Author's GitHub](https://github.com/lucalullo)**
-
----
+[Kaggle notebook](https://www.kaggle.com/code/lucalullo/home-credit-default-risk) · [Explore the notebook](home-credit-default-risk.ipynb) · [GitHub profile](https://github.com/lucalullo)
 
 ## At a glance
 
 | | |
 |---|---|
-| **Task** | Binary classification: credit default risk prediction |
+| **Task** | Binary classification: loan default risk (`TARGET`) |
 | **Competition** | Kaggle Home Credit Default Risk |
-| **Model** | XGBoost Classifier |
-| **Class distribution** | Approximately 91.9% non-default, 8.1% default |
-| **Feature engineering** | Aggregations from six additional credit and payment datasets |
-| **Model comparison** | Logistic Regression, Extra Trees, XGBoost |
-| **Optimization** | Optuna, 50 trials maximizing ROC-AUC |
-| **Decision threshold** | Precision-Recall optimization with minimum precision of 20% |
-| **Interpretability** | SHAP global and individual explanations |
+| **Primary model** | XGBoost, following baseline model comparisons |
+| **Recorded final holdout ROC-AUC** | **0.781** (notebook output; holdout reused for earlier model comparisons and threshold selection) |
+| **Class imbalance** | Approximately 8.07% positive class in the original training data |
+| **Feature engineering** | Application features plus aggregated external credit and payment histories |
+| **Optimization** | Optuna hyperparameter search and precision-constrained decision threshold |
+| **Interpretability** | SHAP TreeExplainer and example-level explanations |
 | **Core libraries** | pandas, NumPy, scikit-learn, XGBoost, Optuna, SHAP, imbalanced-learn |
+| **Data** | Kaggle competition CSVs (not redistributed) |
 
-## Why this project matters
+## Project overview
 
-This is an **end-to-end credit risk modeling experiment**: the emphasis is on handling imbalanced financial data, integrating multiple sources of borrower information, and building an interpretable classification model.
-
-Rather than focusing exclusively on predictive performance, the workflow also examines class imbalance strategies, decision thresholds, and the factors influencing individual predictions.
+This is an **end-to-end credit-risk modeling experiment** aimed at identifying borrowers with an elevated probability of default. Unlike a leaderboard-only entry, it also studies feature impact and how a probability score can be converted into an operational classification.
 
 The notebook covers:
 
-- **Data preprocessing:** handling missing values, anomalous placeholders, categorical encoding, and leakage-aware scaling.
-- **Class imbalance:** comparing class weighting, SMOTE, and undersampling strategies.
-- **Model comparison:** evaluating Logistic Regression, Extra Trees, and XGBoost.
-- **Multi-source feature engineering:** aggregating credit history, previous applications, installment payments, and account balances.
-- **Hyperparameter optimization:** using Optuna to maximize validation ROC-AUC across 50 trials.
-- **Threshold selection:** adjusting the classification threshold using Precision-Recall analysis.
-- **Model explainability:** applying SHAP to identify global risk drivers and explain individual predictions.
+- **Exploration:** examining missing values and the strong target-class imbalance.
+- **Baseline comparisons:** evaluating Logistic Regression, Extra Trees, and XGBoost.
+- **Feature engineering:** aggregating information from auxiliary tables covering applications and credit/payment histories.
+- **Optimization:** using Optuna to search XGBoost settings.
+- **Threshold selection:** choosing a classification threshold under a minimum precision constraint.
+- **Interpretability:** exploring global and individual predictions with SHAP.
+- **Submission:** generating default-risk predictions for Kaggle's unlabeled test data.
 
-## Approach
+## Methodology
 
 ```text
-Home Credit application data
-            |
-            v
-Data cleaning and preprocessing
-            |
-            v
-Class imbalance evaluation
-            |
-            v
-Baseline model comparison
-            |
-            v
-Multi-source feature engineering
-            |
-            v
-Incremental ROC-AUC validation
-            |
-            v
-XGBoost + Optuna optimization
-            |
-            v
-Precision-Recall threshold tuning
-            |
-            v
-SHAP model explanations
-            |
-            v
-Credit default risk predictions
+Kaggle application + historical data
+        |
+        v
+Exploration + preprocessing
+        |
+        v
+Class imbalance analysis
+        |
+        v
+Model baseline comparison
+        |
+        v
+Multi-table feature aggregation
+        |
+        v
+Optuna-tuned XGBoost
+        |
+        v
+Holdout ROC-AUC evaluation
+        |
+        +----> Precision-constrained threshold
+        |
+        +----> SHAP global + local explanations
+        |
+        v
+Competition test predictions
 ```
 
 ### Implementation details
 
 | Component | Notebook implementation |
 |---|---|
-| Missing values | Median imputation for numerical features, mode for categorical features |
-| Anomalous values | Replace `DAYS_EMPLOYED = 365243` with `NaN` |
-| Categorical encoding | One-Hot Encoding with `drop_first=True` |
-| Feature scaling | StandardScaler fitted on training data only |
-| Imbalance strategies | Class weighting, SMOTE, undersampling |
-| Baseline models | Logistic Regression and Extra Trees |
-| Final model | XGBoost Classifier |
-| Feature engineering | Aggregations from six additional datasets |
-| Model selection | ROC-AUC and incremental feature validation |
-| Hyperparameter tuning | Optuna, 50 trials |
-| Decision threshold | Precision-Recall curve, minimum precision 20% |
-| Interpretability | SHAP TreeExplainer, bar, beeswarm, and waterfall plots |
+| Baseline models | Logistic Regression, Extra Trees, XGBoost |
+| Validation | Stratified 80/20 holdout split |
+| Class imbalance | Examination of minority-class recall, F1 and ROC-AUC; class weighting in XGBoost |
+| Feature engineering | Aggregations across related application, bureau, and payment records |
+| Search | Optuna maximizing validation ROC-AUC |
+| Decision threshold | Maximum recall among thresholds satisfying precision ≥ 0.20, selected directly on the final holdout labels |
+| Explainability | SHAP TreeExplainer, global and individual explanations |
 
-## Feature engineering
+The recorded threshold is an **experimental classification rule**, not a validated lending policy. Although Optuna uses an inner validation split, the outer holdout is also examined during earlier model comparisons and later reused to choose and report the decision threshold; it is therefore not a fully untouched final test set.
 
-The project extends the main application dataset with information from **six additional sources**, capturing different aspects of borrower credit behavior.
+## Results
 
-| Dataset | Information |
-|---|---|
-| `bureau.csv` | Credit history with other financial institutions |
-| `previous_application.csv` | Previous loan applications with Home Credit |
-| `installments_payments.csv` | Installment payment history and punctuality |
-| `POS_CASH_balance.csv` | POS and cash loan account balances |
-| `credit_card_balance.csv` | Credit card usage and payment delays |
-| `bureau_balance.csv` | Monthly status of external credit accounts |
+The saved notebook outputs report:
 
-Each source is evaluated through incremental ROC-AUC validation before proceeding with further feature integration.
+| Measurement | Recorded value |
+|---|---:|
+| Best Optuna study ROC-AUC | **0.7768** |
+| Final holdout ROC-AUC | **0.781** |
+| Selected decision threshold | **0.534** |
+| Positive-class precision at selected threshold | **0.20** |
+| Positive-class recall at selected threshold | **0.64** |
 
-This approach examines whether additional borrower information contributes useful predictive signal rather than assuming that more features necessarily improve model performance.
+These are notebook evaluation outputs, **not Kaggle leaderboard results**. The holdout is consulted during earlier model comparisons, although Optuna tuning itself uses a separate inner validation split. The threshold is then selected and assessed on that same outer holdout. Consequently, the precision and recall at the chosen threshold are **in-sample for threshold selection** and may be optimistic; the ROC-AUC is also not a strictly untouched final-test estimate given the earlier comparisons.
 
-## Model selection and optimization
-
-### Class imbalance
-
-The original dataset is highly imbalanced, with approximately **8.1% default cases** and **91.9% non-default cases**.
-
-The notebook compares three strategies using Logistic Regression:
-
-- **Class weighting:** adjusts the importance of minority-class observations without changing the dataset.
-- **SMOTE:** generates synthetic minority-class examples.
-- **Undersampling:** reduces the number of majority-class observations.
-
-Class weighting is selected based on its ROC-AUC performance in the reported experiments.
-
-### Model comparison
-
-Three classification approaches are examined:
-
-| Model | Role |
-|---|---|
-| Logistic Regression | Linear baseline and imbalance strategy evaluation |
-| Extra Trees | Nonlinear ensemble comparison |
-| XGBoost | Final gradient boosting model |
-
-Extra Trees is discarded following concerns about probability calibration, while XGBoost is selected for its ability to capture nonlinear relationships in the engineered features.
-
-### Hyperparameter tuning
-
-The final XGBoost model is optimized using **Optuna with 50 trials**, maximizing validation ROC-AUC.
-
-The search includes:
-
-- `n_estimators`
-- `max_depth`
-- `learning_rate`
-- `subsample`
-- `colsample_bytree`
-- `min_child_weight`
-
-Optimization uses a separate validation set, keeping the test set outside the tuning process.
-
-### Decision threshold
-
-The classification threshold is tuned using the **Precision-Recall curve**, with a minimum precision constraint of 20%.
-
-This separates the model's ability to rank borrowers by predicted risk from the decision rule used to classify applications.
-
-The selected threshold reflects the chosen precision constraint rather than a universally optimal credit decision policy.
-
-## Model interpretability
-
-The project uses **SHAP TreeExplainer** to examine how input features contribute to XGBoost predictions.
-
-The notebook includes:
-
-- **Global feature importance:** a SHAP bar chart ranking influential variables.
-- **Feature impact and direction:** a beeswarm plot showing how feature values affect predictions.
-- **Individual explanations:** waterfall plots illustrating the contributions behind specific borrower predictions.
-- **Business interpretation:** a report discussing risk factors, protective factors, and operational recommendations.
-
-These explanations describe model behavior and should not be interpreted as causal effects of borrower characteristics on default risk.
-
-## Dataset
-
-The analysis uses the **[Home Credit Default Risk](https://www.kaggle.com/competitions/home-credit-default-risk/data)** competition dataset, which includes application records and related historical credit information.
-
-The additional tables provide information about previous applications, installment payments, external credit accounts, and account balances.
-
-The competition data are not redistributed in this repository. Access and permitted use are governed by Kaggle and the relevant competition rules.
-
-## Repository contents
+## Repository structure
 
 ```text
-Home-Credit-Default-Risk/
+home-credit-default-risk/
 ├── README.md
-└── home-credit-default-risk.ipynb
+├── home-credit-default-risk.ipynb
+├── .gitignore
+└── LICENSE
 ```
 
-The notebook contains the original preprocessing, model comparisons, feature engineering, optimization, and SHAP interpretability workflow.
+## Getting started
 
-## Run the notebook
+The reference environment is **Kaggle**, using the [Home Credit Default Risk competition data](https://www.kaggle.com/competitions/home-credit-default-risk/data).
 
-The reference environment is **Kaggle**, where the original notebook and competition data are available.
-
-To run it locally, install the required dependencies:
+For local execution, install the principal notebook dependencies:
 
 ```bash
-python -m pip install pandas numpy scikit-learn xgboost imbalanced-learn optuna shap matplotlib seaborn jupyter
+python -m pip install pandas numpy scipy scikit-learn xgboost imbalanced-learn optuna shap matplotlib seaborn jupyter
 ```
 
-Then:
+Download the competition CSVs, open `home-credit-default-risk.ipynb`, and update the input directory used by the notebook. Full execution can be resource-intensive due to auxiliary-table aggregation, hyperparameter optimization and SHAP calculations.
 
-1. Download the data from the [Home Credit Default Risk competition](https://www.kaggle.com/competitions/home-credit-default-risk/data).
-2. Open `home-credit-default-risk.ipynb` in Jupyter.
-3. Make the competition CSV files available.
-4. Update any Kaggle-specific file paths to match the local dataset location.
+## Limitations
 
-Local execution requires a compatible Python environment and access to the competition data.
-
-## Scope and limitations
-
-- The project is a **credit default classification experiment**, not a validated production credit scoring system.
-- The dataset is highly imbalanced, making accuracy alone an insufficient measure of predictive performance.
-- ROC-AUC evaluates ranking performance but does not establish probability calibration or the effectiveness of a particular operational threshold.
-- The minimum precision constraint of 20% is an experimental decision rule, not a validated lending policy.
-- SHAP explanations describe model predictions rather than causal relationships.
-- Performance on other borrower populations, economic conditions, or lending portfolios is not established.
-- No final Kaggle leaderboard score is documented in the supplied project description.
+- This notebook is an exploratory classification study, **not a validated credit decision system**.
+- Class imbalance makes accuracy alone uninformative; ROC-AUC does not guarantee probability calibration.
+- The same outer holdout is used for earlier model comparisons and, after final model fitting, both threshold selection and threshold-based evaluation. This can bias reported performance; a separate threshold-calibration set and genuinely untouched final test set are needed.
+- The decision threshold is selected using experimental data and requires independent validation before any practical use.
+- SHAP describes model predictions, not causal drivers of default.
+- Distribution shift, fairness, regulatory compliance, and production monitoring are not established here.
+- The final Kaggle leaderboard score is not established by the notebook results presented above.
+- Competition data are not included; access and permitted use are governed by Kaggle.
 
 ## Related work
-
-This project complements my other work on applied machine learning, feature engineering, model optimization, and interpretable predictive systems.
 
 - [GitHub profile and selected projects](https://github.com/lucalullo)
 - [Kaggle profile](https://www.kaggle.com/lucalullo)
 
----
+## Author
 
-**Author:** [Luca Lullo](https://github.com/lucalullo)  
-**Original Kaggle work:** [Home Credit Default Risk](https://www.kaggle.com/code/lucalullo/home-credit-default-risk)
+Created by [Luca Lullo](https://github.com/lucalullo). Original work: [Home Credit Default Risk on Kaggle](https://www.kaggle.com/code/lucalullo/home-credit-default-risk).
